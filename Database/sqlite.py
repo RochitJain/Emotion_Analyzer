@@ -6,7 +6,7 @@ cursor = conn.cursor()
 
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS Emotion_analyzer(
-               id INTERGER PRIMARY KEY,
+               id INTEGER PRIMARY KEY,
                name TEXT NOT NULL,
                emotion TEXT NOT NULL,
                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
