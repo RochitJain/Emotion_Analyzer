@@ -1,15 +1,29 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import List
-
+from sqlite import insert,view
+from textblob import TextBlob
 app = FastAPI()
 
+# # init_db()
 class Emotion(BaseModel):
-    id: int
+    text: str
     name: str
-    emotion: str
 
 emotions: List[Emotion] = []
+
+
+def textblob_sentiment (text):
+    blob = TextBlob(text)
+    polarity = round(blob.sentiment.polarity,4)
+    subjectivity = round(blob.sentiment.subjectivity,4)
+    if polarity >= 0.3 : 
+        emotion = "Positive"
+    elif polarity <= -0.3 :
+        emotion = "Negative"
+    else :
+        emotion = "Neutral"
+    return {"polarity": polarity, "subjectivity": subjectivity, "emotion": emotion}
 
 @app.get("/")
 def root ():
@@ -17,11 +31,15 @@ def root ():
     
 @app.get("/emotions")
 def getAllEmotions():
-    return emotions
+    data= view()
+    return data
 
 
 @app.post("/emotion")
-def addEmotion(emotion):
-    emotions.append(emotion)
-    print("Added")
-    return emotions
+def addEmotion(entry: Emotion):
+    text = entry.text
+    sentiment = textblob_sentiment(text)
+    data = insert(entry.name, sentiment,text)
+    # print("Added")
+    # return view()
+    return data
